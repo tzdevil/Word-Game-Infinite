@@ -18,7 +18,7 @@ namespace tzdevil.WordGameInfinite
 
         [HideInInspector] public static bool _canPlay;
 
-        private static float _gameTime;
+        public float _gameTime;
         [SerializeField] private TextMeshProUGUI _gameTimeText;
         [HideInInspector] public bool startedGame;
 
@@ -28,7 +28,7 @@ namespace tzdevil.WordGameInfinite
         private GameObject _resetButton_InGame;
 
         private AudioSource _audio => GetComponent<AudioSource>();
-        private bool _audioPref; // false = kapalý.
+        private bool _audioPref;
 
         private static List<string> _words = new();
 
@@ -93,23 +93,17 @@ namespace tzdevil.WordGameInfinite
             if (_guessThisWord == _ourWord) { CorrectGuess(); return; }
         }
 
-        public static void ErrorLog(string error, float _time)
-        {
-            KeyRelated._errorLog.text = error;
-            KeyRelated._errorTimer = _time;
-        }
-
         private void WrongGuess()
         {
             List<LetterInGame> letterList = _letters
                                     .Where(k => k.transform.parent.name[^1] - '0' == _currentLine)
                                     .ToList();
-            
-            foreach(var v in letterList)
-            {
+
+            for (int i = 0; i < letterList.Count; i++) { 
+                LetterInGame v = letterList[i];
                 if (_guessThisWord.Contains(v.letter.ToString().ToLower()))
                 {
-                    if (v.letter == _guessThisWord[letterList.IndexOf(v)])
+                    if (v.letter == _guessThisWord[i])
                     {
                         v.WordType = WordType.CorrectLetter;
                         _letters.Remove(v);
@@ -118,10 +112,8 @@ namespace tzdevil.WordGameInfinite
                     else
                     {
                         int sum1 = _ourWord.Count(a => v.letter.ToString().ToLower() == a.ToString().ToLower());
-                        //v.WordType = (sum1 < letterList.Count(a => a == v)) ? WordType.CorrectLetterWrongSpot : WordType.Wrong;
                         v.WordType = WordType.CorrectLetterWrongSpot;
                         _letters.Remove(v);
-                        //_keys.FirstOrDefault(a => a.gameObject.name.ToLower() == v.letter.ToString()).letterType = (sum1 < letterList.Count(a => a == v)) ? LetterType.CorrectLetterWrongSpot : LetterType.Wrong;
                         _keys.FirstOrDefault(a => a.gameObject.name.ToLower() == v.letter.ToString()).letterType = LetterType.CorrectLetterWrongSpot;
                     }
                 }
@@ -134,11 +126,6 @@ namespace tzdevil.WordGameInfinite
             }
 
             _words.Add(_ourWord);
-
-            if (_words.Count == 2 && _words[0] == "guile" && _words[1] == "solar")
-            {
-                ErrorLog("<color=#feda55>BROOOOOOOOOO</color>", 5);
-            }
 
             if (_currentLine == 6)
             {
@@ -165,7 +152,7 @@ namespace tzdevil.WordGameInfinite
                 GameObject.Find($"Word_{_currentLine}").transform.Find(i.ToString()).Find("Letter").GetComponent<TextMeshProUGUI>().text = _ourWord[i - 1].ToString().ToUpper();
                 GameObject.Find($"Word_{_currentLine}").transform.Find(i.ToString()).GetComponent<LetterInGame>().WordType = WordType.CorrectLetter;
             }
-            ErrorLog($"Correct! The word was <color=#B59F3B>{_guessThisWord}</color>.\n You guessed it in <color=#538D4E>{_gameTime:0.0}</color> seconds.", 999);
+            ErrorLog($"Correct! The word was <color=#B59F3B>{_guessThisWord}</color>.\n You guessed it in <color=#538D4E>{_gameTime:n1}</color> seconds.", 999);
             _resetButton_InGame.SetActive(true);
         }
 
@@ -174,6 +161,12 @@ namespace tzdevil.WordGameInfinite
             ErrorLog($"You lost. The word was <color=#B59F3B>{_guessThisWord}</color>.", 999);
             _canPlay = false;
             _resetButton_InGame.SetActive(true);
+        }
+
+        public static void ErrorLog(string error, float _time)
+        {
+            KeyRelated._errorLog.text = error;
+            KeyRelated._errorTimer = _time;
         }
 
         public void OpenSettings()
@@ -210,7 +203,7 @@ namespace tzdevil.WordGameInfinite
                 v.letterType = LetterType.Default;
 
             _guessThisWord = _textData[Random.Range(0, _textData.Count)];
-            _gameTime = 0;
+            //_gameTime = 0;
             KeyRelated._errorTimer = 0.1f;
             _settingsPanel.SetActive(false);
             _resetButton_InGame.SetActive(false);

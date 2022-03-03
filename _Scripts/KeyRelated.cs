@@ -18,7 +18,6 @@ namespace tzdevil.WordGameInfinite
 
         public GameManager gameManager => GetComponent<GameManager>();
 
-        private float _gameTime;
         private TextMeshProUGUI _gameTimeText => GameObject.Find("GameTime").GetComponent<TextMeshProUGUI>();
         [HideInInspector] public bool startedGame;
 
@@ -36,7 +35,7 @@ namespace tzdevil.WordGameInfinite
 
         private void TextAndColor()
         {
-            if (startedGame && GameManager._canPlay) _gameTime += Time.deltaTime;
+            if (startedGame && GameManager._canPlay) gameManager._gameTime += Time.deltaTime;
             if (!GameManager._canPlay) _gameTimeText.color = new Color32(83, 141, 78, 255);
 
             _enterKey.GetComponent<Image>().sprite = gameManager._ourWord.Length == 5 ? _enterKeyNormal : _enterKeyForbidden;
@@ -45,7 +44,7 @@ namespace tzdevil.WordGameInfinite
             _backSpaceKey.GetComponent<Image>().sprite = gameManager._ourWord.Length != 0 ? _backSpaceKeyNormal : _backSpaceKeyForbidden;
             _backSpaceKey.GetComponent<Image>().raycastTarget = gameManager._ourWord.Length != 0;
 
-            _gameTimeText.text = _gameTime.ToString("0.0s");
+            _gameTimeText.text = gameManager._gameTime.ToString("0.0s");
 
             if (_errorTimer > 0) _errorTimer -= Time.deltaTime;
             Color errorColor = _errorLog.color;
@@ -127,7 +126,6 @@ namespace tzdevil.WordGameInfinite
 
             gameManager._letters.Where(a => a.transform.parent == GameObject.Find($"Word_{gameManager._currentLine}").transform).ToList().ForEach(delegate (LetterInGame l)
             {
-                print("sup");
                 l.letter = ' ';
                 l.WordType = WordType.Default;
                 l.WriteLetter();

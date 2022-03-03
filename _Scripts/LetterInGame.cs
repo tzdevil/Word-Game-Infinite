@@ -34,7 +34,6 @@ namespace tzdevil.WordGameInfinite
 
         private void Start() => WriteLetter();
 
-        //public void WriteLetter() => letterText.text = letter.ToString();
         public void WriteLetter() => letterText.text = letter.ToString().ToUpper();
 
         private void CheckWordType()
